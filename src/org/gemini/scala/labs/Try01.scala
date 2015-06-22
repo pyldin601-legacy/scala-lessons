@@ -6,10 +6,14 @@ import scala.math._
 
 object Try01 extends App {
 
-  def fact(n: Int, acc: BigInt = 1): BigInt =
-    if (n <= 1) acc
-    else fact(n - 1, acc * n)
+  def fact(n: Int): BigInt =
+    n match {
+      case 0 => 1
+      case _ => n * fact(n - 1)
+    }
 
-  (0 until 10) map(fact(_)) foreach println
+  println(for (x <- 0 until 10) fact(x))
+
+  (0 until 10) map fact foreach println
 
 }
