@@ -8,7 +8,7 @@ object MutualFractions extends App {
     number != 1 && 2.until(sqrt(number).toInt + 1).forall(number % _ != 0)
 
   def calculatePrimes(number: Int): Seq[Int] = {
-    2 +: (3 until (number, 2)).filter(isPrime)
+    2 +: (3 until number by 2).filter(isPrime)
   }
 
   def calculateFractions(number: Int): Seq[Int] = {
