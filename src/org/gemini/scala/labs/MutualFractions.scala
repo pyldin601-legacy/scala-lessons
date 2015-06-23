@@ -14,6 +14,14 @@ object MutualFractions extends App {
     value.map(calculateFractions).reduce(_ intersect _)
   }
 
-  println(calculateMutualFractions(512, 256, 1024))
+  val start = System.currentTimeMillis()
+  var counter = 0L
+
+  while (System.currentTimeMillis() - start < 5000L) {
+    calculateMutualFractions(2048, 1024)
+    counter += 1
+  }
+
+  println(counter)
 
 }
