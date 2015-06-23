@@ -21,7 +21,7 @@ object MutualFractions extends App {
     value.map(calculateFractions).reduce(_ intersect _)
   }
   
-
+  println("Hello, World!")
 
 //  var counter = 0
 //  val start = System.currentTimeMillis()

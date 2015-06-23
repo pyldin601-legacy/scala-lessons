@@ -1,19 +1,18 @@
 package org.gemini.scala.labs
 
 
+import scala.beans.BeanProperty
 import scala.math._
 
 
 object Try01 extends App {
 
-  def fact(n: Int): BigInt =
-    n match {
-      case 0 => 1
-      case _ => n * fact(n - 1)
-    }
+  case class Person(@BeanProperty var name: String, @BeanProperty var age: Int)
 
-  println(for (x <- 0 until 10) fact(x))
+  val p = new Person(name = "Roman", age = 30)
 
-  (0 until 10) map fact foreach println
+  p.setAge(p.getAge + 1)
+
+  print(p)
 
 }
