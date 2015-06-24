@@ -2,7 +2,6 @@ package org.gemini.scala.fun
 
 /**
  * Created by Roman on 24.06.2015
- * Going to learn Scala until autumn
  */
 object Brackets extends App {
 
