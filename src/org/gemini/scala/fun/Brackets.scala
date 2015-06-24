@@ -31,12 +31,6 @@ object Brackets extends App {
     _val(str.toCharArray, None)
   }
 
-  def validateBracketsQuotes(str: String): Boolean = {
-    val brackets = Array('(', ')', '[', ']', '{', '}')
-    val quotes = Array(''', '"')
-    false
-  }
-
   val testLines = Array(
     "[hello}{]",
     "[Hello]",
