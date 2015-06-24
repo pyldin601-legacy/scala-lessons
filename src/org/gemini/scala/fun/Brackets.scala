@@ -24,9 +24,7 @@ object Brackets extends App {
                 _val(chars.tail, current.takeRight(0))
               else false
           }
-
       }
-
     }
     _val(str.toCharArray)
   }
