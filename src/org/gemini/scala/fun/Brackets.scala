@@ -13,32 +13,37 @@ object Brackets extends App {
    */
   def validateBrackets(str: String): Boolean = {
     val brackets = Array('(', ')', '[', ']', '{', '}')
-    def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
+    def _val(chars: Array[Char], current: Option[Int]): Boolean = {
       chars.isEmpty match {
         case true => current.isEmpty
         case _ =>
-          val bracketIndex = brackets.indexOf(chars.head)
+          brackets.indexOf(chars.head) match {
+            case -1 => _val(chars.tail, current)
+            case index =>
+              if ((index & 1) == 0) _val(chars.tail, Some(index))
+              else if (current.isDefined && index - current.get == 1) true
+              else false
+          }
 
-          if (bracketIndex == -1) _val(chars.tail, current)
-          else if (current.isDefined && bracketIndex == current.get) true
-          else if ((bracketIndex & 1) == 0) _val(chars.tail, Some(bracketIndex))
-          else if (current.isDefined && bracketIndex - current.get == 1) true
-          else false
       }
 
     }
-    _val(str.toCharArray)
+    _val(str.toCharArray, None)
+  }
+
+  def validateBracketsQuotes(str: String): Boolean = {
+    val brackets = Array('(', ')', '[', ']', '{', '}')
+    val quotes = Array(''', '"')
+    false
   }
 
   val testLines = Array(
     "[hello}{]",
     "[Hello]",
     "[Hello{}]()",
-    "Test this [(])",
-    "This may { fail Test",
-    "({{{[{}]}}})",
-    "{hello",
-    "hello}"
+    "[(])",
+    "Good \"Quotes\" here '{}'",
+    "''{'}'"
   )
 
   testLines.map((t) => t + " -> " + validateBrackets(t)).foreach(println)
