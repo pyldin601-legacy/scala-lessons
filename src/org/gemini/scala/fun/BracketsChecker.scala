@@ -24,7 +24,7 @@ object BracketsChecker extends App {
             case index =>
               if ((index & 1) == 0) _val(chars.tail, current :+ index)
               else if (current.nonEmpty && index - current.last == 1)
-                _val(chars.tail, current.takeRight(0))
+                _val(chars.tail, current.dropRight(1))
               else false
           }
       }
