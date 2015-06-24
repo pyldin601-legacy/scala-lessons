@@ -33,12 +33,12 @@ object BracketsChecker extends App {
   }
 
   val testLines = Array(
-    "[hello}{]",
-    "[Hello]",
-    "[Hello{}{{]()",
-    "[(])",
-    "Good \"Quotes\" here '{}'",
-    "''{'}'"
+    "a(b)",
+    "[{}]",
+    "[(]",
+    "}{",
+    "z([{}-()]{a})",
+    ""
   )
 
   testLines.map((t) => t + " -> " + checkBrackets(t)).foreach(println)
