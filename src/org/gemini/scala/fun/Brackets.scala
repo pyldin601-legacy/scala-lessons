@@ -1,7 +1,8 @@
 package org.gemini.scala.fun
 
 /**
- * Created by Roman on 24.06.2015.
+ * Created by Roman on 24.06.2015
+ * Going to learn Scala until autumn
  */
 object Brackets extends App {
 
@@ -12,18 +13,41 @@ object Brackets extends App {
    */
   def validateBrackets(str: String): Boolean = {
     val brackets = Array('(', ')', '[', ']', '{', '}')
-    val filtered = str.filter(brackets contains _).toCharArray
     def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
-      if (chars.isEmpty) return current.isEmpty
+      chars.isEmpty match {
+        case true => current.isEmpty
+        case _ =>
+          val bracketIndex = brackets.indexOf(chars.head)
 
-      val index = brackets.indexOf(chars.head)
+          if (bracketIndex == -1) _val(chars.tail, current)
+          else if (current.isDefined && bracketIndex == current.get) true
+          else if ((bracketIndex & 1) == 0) _val(chars.tail, Some(bracketIndex))
+          else if (current.isDefined && bracketIndex - current.get == 1) true
+          else false
+      }
 
-      if (current.isDefined && index == current.get) true
-      else if ((index & 1) == 0) _val(chars.tail, Some(index))
-      else if (current.isDefined && index - current.get == 1) true
-      else false
     }
-    _val(filtered)
+    _val(str.toCharArray)
+  }
+
+  def validateBracketsQuotes(str: String): Boolean = {
+    val brackets = Array('(', ')', '[', ']', '{', '}')
+    val quotes = Array(''', '"')
+    def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
+      chars.isEmpty match {
+        case true => current.isEmpty
+        case _ =>
+          val quoteIndex = quotes.indexOf(chars.head)
+          val bracketIndex = brackets.indexOf(chars.head)
+
+          if (current.isDefined && bracketIndex == current.get) true
+          else if ((bracketIndex & 1) == 0) _val(chars.tail, Some(bracketIndex))
+          else if (current.isDefined && bracketIndex - current.get == 1) true
+          else false
+      }
+
+    }
+    _val(str.toCharArray)
   }
 
   val testLines = Array(
