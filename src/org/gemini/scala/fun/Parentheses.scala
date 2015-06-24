@@ -6,28 +6,26 @@ import scala.collection.mutable
  * Created by Roman on 24.06.2015.
  */
 object Parentheses extends App {
-  def isValidParentheses(str: String): Boolean = {
-    val validOpeners = Array('(', '[', '{')
-    val validClosers = Array(')', ']', '}')
-    val stack = mutable.Stack[Int]()
-    for (c <- str) {
-      if (validOpeners contains c) {
-        stack.push(validOpeners indexOf c)
-      } else if (validClosers contains c) {
-        if (stack.isEmpty) {
-          return false
-        }
-        if (validClosers.indexOf(c) != stack.pop()) {
-          return false
-        }
-      }
+
+  def validator(str: String): Boolean = {
+    val parentheses = Array('(', ')', '[', ']', '{', '}')
+    val filtered = str.filter(parentheses contains _).toCharArray
+    def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
+      if (chars.isEmpty) return true
+
+      val index = parentheses.indexOf(chars.head)
+
+      if ((index & 1) == 0) _val(chars.tail, Some(index))
+      else if (current.isDefined && index - current.get == 1) true
+      else false
     }
-    true
+    _val(filtered)
   }
 
-  println(isValidParentheses("[Hello]"))
-  println(isValidParentheses("['Hello'{}]()"))
-  println(isValidParentheses("Test[(])"))
-  println(isValidParentheses("Test Test"))
-  println(isValidParentheses("{{{{}}}}"))
+  println(validator("[Hello]"))
+  println(validator("['Hello'{}]()"))
+  println(validator("Test[(])"))
+  println(validator("Test Test"))
+  println(validator("{{{{}}}}"))
+
 }
