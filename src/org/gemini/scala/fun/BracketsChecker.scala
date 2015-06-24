@@ -10,7 +10,7 @@ object BracketsChecker extends App {
    * text are correctly nested. It considers brackets
    * of three kinds: (), [], {}.
    * 
-   * @param text String with text to checks
+   * @param text String with text to check
    * @return Boolean
    */
   def checkBrackets(text: String): Boolean = {
