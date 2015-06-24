@@ -6,14 +6,14 @@ import scala.collection.mutable
  * Created by Roman on 24.06.2015.
  */
 object Parentheses extends App {
-  def isValid(str: String): Boolean = {
+  def isValidParentheses(str: String): Boolean = {
     val validOpeners = Array('(', '[', '{')
     val validClosers = Array(')', ']', '}')
     val stack = mutable.Stack[Int]()
     for (c <- str) {
-      if (validOpeners.contains(c)) {
+      if (validOpeners contains c) {
         stack.push(validOpeners indexOf c)
-      } else if (validClosers.contains(c)) {
+      } else if (validClosers contains c) {
         if (stack.isEmpty) {
           return false
         }
@@ -24,9 +24,10 @@ object Parentheses extends App {
     }
     true
   }
-  println(isValid("[]"))
-  println(isValid("[{}]()"))
-  println(isValid("[(])"))
-  println(isValid(""))
-  println(isValid("{{{{}}}}"))
+
+  println(isValidParentheses("[Hello]"))
+  println(isValidParentheses("['Hello'{}]()"))
+  println(isValidParentheses("Test[(])"))
+  println(isValidParentheses("Test Test"))
+  println(isValidParentheses("{{{{}}}}"))
 }
