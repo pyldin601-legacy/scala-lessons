@@ -7,7 +7,7 @@ object BracketsChecker extends App {
 
   /**
    * Function which checks whether brackets within
-   * text are correctly nested. We consider brackets
+   * text are correctly nested. It considers brackets
    * of three kinds: (), [], {}.
    * 
    * @param text String with text to checks
