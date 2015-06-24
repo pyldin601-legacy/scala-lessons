@@ -6,11 +6,13 @@ package org.gemini.scala.fun
 object Brackets extends App {
 
   /**
-   * Validates the correctness of nested brackets and quotes
-   * @param str String with text to validate
+   * Function which checks whether brackets within
+   * text are correctly nested. We consider brackets
+   * of three kinds: (), [], {}.
+   * @param text String with text to validate
    * @return Boolean
    */
-  def validateBrackets(str: String): Boolean = {
+  def validateBrackets(text: String): Boolean = {
     val brackets = Array('(', ')', '[', ']', '{', '}')
     def _val(chars: Array[Char], current: List[Int] = Nil): Boolean = {
       chars.isEmpty match {
@@ -26,7 +28,7 @@ object Brackets extends App {
           }
       }
     }
-    _val(str.toCharArray)
+    _val(text.toCharArray)
   }
 
   val testLines = Array(
