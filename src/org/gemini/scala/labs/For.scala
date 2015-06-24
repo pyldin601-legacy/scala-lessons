@@ -5,9 +5,9 @@ package org.gemini.scala.labs
  */
 object For extends App {
 
-  for {
+  var result = for {
     i <- 0 until 5 filter(_ % 2 == 0)
     j <- 0 until 5 filter(_ % 2 == 1)
-  } println (i, j)
+  } yield (i, j)
 
 }
