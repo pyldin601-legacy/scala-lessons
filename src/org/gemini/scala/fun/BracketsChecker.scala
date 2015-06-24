@@ -15,7 +15,7 @@ object BracketsChecker extends App {
    */
   def checkBrackets(text: String): Boolean = {
     val brackets = Array('(', ')', '[', ']', '{', '}')
-    def _val(chars: Array[Char], current: List[Int] = Nil): Boolean = {
+    def _val(chars: Array[Char], current: List[Int] = Nil): Boolean =
       chars.isEmpty match {
         case true => current.isEmpty
         case _ =>
@@ -27,7 +27,7 @@ object BracketsChecker extends App {
                 _val(chars.tail, current.dropRight(1))
               else false
           }
-      }
+
     }
     _val(text.toCharArray)
   }
