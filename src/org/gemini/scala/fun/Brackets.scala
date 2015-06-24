@@ -40,7 +40,7 @@ object Brackets extends App {
   val testLines = Array(
     "[hello}{]",
     "[Hello]",
-    "[Hello{}]()",
+    "[Hello{}{{]()",
     "[(])",
     "Good \"Quotes\" here '{}'",
     "''{'}'"
