@@ -30,27 +30,8 @@ object Brackets extends App {
     _val(str.toCharArray)
   }
 
-  def validateBracketsQuotes(str: String): Boolean = {
-    val brackets = Array('(', ')', '[', ']', '{', '}')
-    val quotes = Array(''', '"')
-    def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
-      chars.isEmpty match {
-        case true => current.isEmpty
-        case _ =>
-          val quoteIndex = quotes.indexOf(chars.head)
-          val bracketIndex = brackets.indexOf(chars.head)
-
-          if (current.isDefined && bracketIndex == current.get) true
-          else if ((bracketIndex & 1) == 0) _val(chars.tail, Some(bracketIndex))
-          else if (current.isDefined && bracketIndex - current.get == 1) true
-          else false
-      }
-
-    }
-    _val(str.toCharArray)
-  }
-
   val testLines = Array(
+    "[hello}{]",
     "[Hello]",
     "[Hello{}]()",
     "Test this [(])",
