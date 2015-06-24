@@ -11,16 +11,15 @@ object Brackets extends App {
    * @return Boolean
    */
   def validateBrackets(str: String): Boolean = {
-    val brackets = Array('(', ')', '[', ']', '{', '}', ''', '"')
+    val brackets = Array('(', ')', '[', ']', '{', '}')
     val filtered = str.filter(brackets contains _).toCharArray
-    val quoteOffset = 6
     def _val(chars: Array[Char], current: Option[Int] = None): Boolean = {
       if (chars.isEmpty) return current.isEmpty
 
       val index = brackets.indexOf(chars.head)
 
-      if (current.isDefined && index >= quoteOffset && index == current.get) true
-      else if ((index & 1) == 0 || index >= quoteOffset) _val(chars.tail, Some(index))
+      if (current.isDefined && index == current.get) true
+      else if ((index & 1) == 0) _val(chars.tail, Some(index))
       else if (current.isDefined && index - current.get == 1) true
       else false
     }
@@ -30,13 +29,11 @@ object Brackets extends App {
   val testLines = Array(
     "[Hello]",
     "[Hello{}]()",
-    "Test 'this' [(])",
-    "Test 'this may { fail' Test",
-    "Test 'this may { fail' Test",
-    "{{{{}}}}",
-    "{hello", "hello}",
-    "Text with \"correct [hello]\" quotes",
-    "Text with \"incorrect {\" quotes}"
+    "Test this [(])",
+    "This may { fail Test",
+    "({{{[{}]}}})",
+    "{hello",
+    "hello}"
   )
 
   testLines.map((t) => t + " -> " + validateBrackets(t)).foreach(println)
