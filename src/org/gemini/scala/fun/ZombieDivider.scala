@@ -18,11 +18,3 @@ object ZombieDivider extends App {
 
 }
 
-object Quiz extends App {
-  def f(x: Int ++ String ** Boolean): String = x.a.b
-}
-
-case class ++[A, B](a: A, b: B)
-case class **[A, B](a: A, b: B)
-case class +:[A, B](a: A, b: B)
-case class *:[A, B](a: A, b: B)
