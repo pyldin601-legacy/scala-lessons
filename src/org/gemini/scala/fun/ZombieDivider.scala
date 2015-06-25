@@ -15,7 +15,6 @@ object ZombieDivider extends App {
 
   println(zombie)
 
-  println((zombie / 10).toSet.subsets().map(_.toList).toList)
 
 }
 
