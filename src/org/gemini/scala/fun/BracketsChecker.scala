@@ -13,8 +13,8 @@ object BracketsChecker extends App {
    * @param text String with text to check
    * @return Boolean
    */
-  def checkBrackets(text: String): Boolean = {
-    val brackets = Array('(', ')', '[', ']', '{', '}')
+  def check(text: String): Boolean = {
+    val brackets = Array('(', ')', '[', ']', '{', '}', '<', '>')
     def _val(chars: Array[Char], current: List[Int] = Nil): Boolean =
       chars.isEmpty match {
         case true => current.isEmpty
@@ -34,13 +34,13 @@ object BracketsChecker extends App {
 
   val testLines = Array(
     "a(b)",
-    "[{}]",
+    "[{}]<>>",
     "[(]",
     "}{",
     "z([{}-()]{a})",
     ""
   )
 
-  testLines.map((t) => t + " -> " + checkBrackets(t)).foreach(println)
+  testLines.map((t) => t + " -> " + check(t)).foreach(println)
 
 }
