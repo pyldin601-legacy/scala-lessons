@@ -6,7 +6,7 @@ package org.gemini.scala.fun
 
 object NoVariable extends App {
 
-  implicit class ForwardPipe[A](val value: A) {
+  implicit class ForwardPipe[A](val value: A) extends AnyVal {
     def =>>[B](f: A => B): B = f(value)
   }
 
