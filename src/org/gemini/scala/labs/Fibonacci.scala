@@ -1,7 +1,7 @@
 package org.gemini.scala.labs
 
 /**
- * Created by roman on 27.06.15.
+ * Created by roman on 27.06.15
  */
 object Fibonacci extends App {
 
@@ -9,7 +9,7 @@ object Fibonacci extends App {
     0 #:: 1 #:: (fib zip fib.tail).map(x => x._1 + x._2)
 
 
-  fib take 1000 foreach println
+  fib take 10000 foreach println
 
 }
 
