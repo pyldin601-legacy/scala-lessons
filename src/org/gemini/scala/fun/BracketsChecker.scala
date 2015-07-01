@@ -32,15 +32,36 @@ object BracketsChecker extends App {
     _val(text.toCharArray)
   }
 
+  def checkDumb(text: String): Boolean = {
+    val pairs = Array("()", "{}", "[]")
+    def _check(text: String): Boolean = {
+      val c = pairs.find(text.contains(_))
+      if (text.length == 0) true
+      else if (c.isEmpty) false
+      else c.forall(str => _check(text.replace(str, "")))
+    }
+    _check(text)
+  }
+
+  def checkMath(text: String): Boolean = {
+    val filter: PartialFunction[Char, Int] = {
+      case '(' => 0; case ')' => 1
+      case '{' => 2; case '}' => 3
+      case '[' => 4; case ']' => 5
+    }
+    val bracketsStream = text.toCharArray collect filter
+    false
+  }
+
   val testLines = Array(
-    "a(b)",
-    "[{}]<>>",
-    "[(]",
-    "}{",
-    "z([{}-()]{a})",
-    ""
+//    "a(b)",
+//    "[{{}}]",
+//    "[(]",
+//    "}{",
+    "z([{}-()]{a})"
+//    ""
   )
 
-  testLines.map((t) => t + " -> " + check(t)).foreach(println)
+  testLines.map((t) => t + " -> " + checkMath(t)).foreach(println)
 
 }
