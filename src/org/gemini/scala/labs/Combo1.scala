@@ -5,7 +5,7 @@ package org.gemini.scala.labs
  */
 object Combo1 extends App {
 
-  val list = List(1, 2, 3, 4, 5)
+  val list = List(1, 2, 3, 4, 5, 6)
 
   def part[T](list: List[T]): List[List[List[T]]] = {
     List(list) :: (1 until list.length)
@@ -19,6 +19,9 @@ object Combo1 extends App {
   def calc(arg: List[Int], value: Int): List[String] =
     part(list).filter(eval(_) == value).map(e => display(e) + " = " + value)
 
-  calc(list, 15) foreach println
+  def max(arg: List[Int]) =
+    (1 to arg.product).sortBy(calc(arg, _).length).reverse.head
+
+  println(max(list))
 
 }
