@@ -5,7 +5,6 @@ package org.gemini.scala.labs
  */
 object Combination extends App {
 
-  val source = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 
   def perm[A](arr: List[A]): List[List[A]] =
     if (arr.isEmpty || arr.tail.isEmpty) List(arr)
@@ -34,10 +33,10 @@ object Combination extends App {
   def eval2(exp: List[List[Int]]): Int = exp.map(_.product).sum
   def str2(exp: List[List[Int]]): String = exp.map(_.mkString("*")).mkString(" + ")
 
-  val items = List(1, 2, 3, 4, 5)
 
-  sub(items).filter(_.nonEmpty).flatMap(perm).flatMap(part2).filter(expEval(_) == 64)
-    .map(strInter(64)).foreach(println)
-
+  sub(List(1, 2, 3, 4, 5, 6, 7, 8, 9)).filter(_.nonEmpty).flatMap(part).flatMap(part)
+    .filter(_.map(_.map(_.reduceLeft(10 * _ + _)).product).sum == 100)
+    .map(_.map(_.map(_.mkString("")).mkString("*")).mkString(" + "))
+    .foreach(println)
 
 }
