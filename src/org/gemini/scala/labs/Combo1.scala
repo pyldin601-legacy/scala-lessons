@@ -24,4 +24,5 @@ object Combo1 extends App {
 
   println(calc(list, 4))
 
+
 }

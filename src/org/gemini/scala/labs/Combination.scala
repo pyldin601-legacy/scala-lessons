@@ -4,14 +4,40 @@ package org.gemini.scala.labs
  * Created by roman on 01.07.15
  */
 object Combination extends App {
-  val elems: List[Int] = List(0, 1, 2)
 
-  def perm[A](list: List[A]): List[List[A]] = {
-    if (list.length == 0)
-      List(list)
-    else
-      list.indices.flatMap(k => perm(list.patch(k, Nil, 1)).map(w => list(k) :: w)).toList
-  }
+  val source = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-  println(perm(elems))
+  def perm[A](arr: List[A]): List[List[A]] =
+    if (arr.isEmpty || arr.tail.isEmpty) List(arr)
+    else arr.indices.flatMap(index => perm(arr.patch(index, Nil, 1))
+      .map(arr(index) :: _)).toList
+
+  def sub[A](arr: List[A]): List[List[A]] =
+    if (arr.isEmpty) List(Nil)
+    else if (arr.tail.isEmpty) List(Nil, arr)
+    else sub(arr.tail).flatMap(el => List(el, arr.head :: el))
+
+  def part[A](arr: List[A]): List[List[List[A]]] =
+    List(arr) :: (1 until arr.length).flatMap(index => part(arr drop index)
+      .map(arr.take(index) :: _)).toList
+
+  def part2[A](arr: List[A]): List[List[List[List[A]]]] =
+    part(arr).flatMap(part)
+
+  def strInter[A](res: Int)(exp: List[List[List[A]]]): String =
+    exp.map(_.map(_.mkString("")).mkString("*")).mkString(" + ") + " = " + res
+
+  def expEval(exp: List[List[List[Int]]]): Int =
+    exp.map(_.map(_.reduceLeft(10 * _ + _)).product).sum
+
+
+  def eval2(exp: List[List[Int]]): Int = exp.map(_.product).sum
+  def str2(exp: List[List[Int]]): String = exp.map(_.mkString("*")).mkString(" + ")
+
+  val items = List(1, 2, 3, 4, 5)
+
+  sub(items).filter(_.nonEmpty).flatMap(perm).flatMap(part2).filter(expEval(_) == 64)
+    .map(strInter(64)).foreach(println)
+
+
 }
