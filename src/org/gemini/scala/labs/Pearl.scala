@@ -7,8 +7,7 @@ object Pearl extends App {
 
   def part[A](arr: List[A]): List[List[List[A]]] =
     List(arr) :: (1 until arr.length).flatMap(
-      i => part(arr drop i).map((arr take i) :: _)
-    ).toList
+      i => part(arr drop i).map((arr take i) :: _)).toList
 
   def eval(arr: List[List[List[Int]]]): Int =
     arr.map(_.map(_.reduceLeft(10 * _ + _)).product).sum
