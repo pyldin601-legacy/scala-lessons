@@ -1,7 +1,7 @@
 package org.gemini.scala.labs
 
 /**
- * Created by roman on 07.07.15.
+ * Created by roman on 07.07.15
  */
 object Pearl extends App {
 
