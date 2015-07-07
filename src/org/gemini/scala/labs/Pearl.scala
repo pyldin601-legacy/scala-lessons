@@ -15,8 +15,8 @@ object Pearl extends App {
   def toStr(arr: List[List[List[Int]]]): String =
     arr.map(_.map(_.mkString("")).mkString("*")).mkString(" + ")
 
-  val array = List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+  val array = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
 
-  part(array).flatMap(part).filter(eval(_) == 100).map(toStr).foreach(println)
+  part(array).flatMap(part).filter(eval(_) == 101).map(toStr).foreach(println)
 
 }
