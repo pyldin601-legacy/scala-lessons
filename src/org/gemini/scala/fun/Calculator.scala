@@ -19,8 +19,8 @@ object Calculator extends App {
   case object ClosedBracket extends Operator(10)
   case object OpenedBracket extends Operator(10)
 
-  case class UnOperator(override val priority: Int, calc: Double => Double) extends Operator(priority)
-  case class BiOperator(override val priority: Int, calc: (Double, Double) => Double) extends Operator(priority)
+  case class UnOperator(name: String, override val priority: Int, calc: Double => Double) extends Operator(priority)
+  case class BiOperator(name: String, override val priority: Int, calc: (Double, Double) => Double) extends Operator(priority)
   case class Digit(value: Double) extends Token { def get = value.toDouble }
 
   val expression = "(sin (1.1 + 10) / 2) + 10"
@@ -35,12 +35,12 @@ object Calculator extends App {
     case d if isNumber(d) => Digit(d.toDouble)
     case "("              => OpenedBracket
     case ")"              => ClosedBracket
-    case "+"              => BiOperator(1, _ + _)
-    case "-"              => BiOperator(1, _ - _)
-    case "*"              => BiOperator(2, _ * _)
-    case "/"              => BiOperator(2, _ / _)
-    case "sin"            => UnOperator(3, scala.math.sin)
-    case "cos"            => UnOperator(3, scala.math.cos)
+    case "+"              => BiOperator("+", 1, _ + _)
+    case "-"              => BiOperator("-", 1, _ - _)
+    case "*"              => BiOperator("*", 2, _ * _)
+    case "/"              => BiOperator("/", 2, _ / _)
+    case "sin"            => UnOperator("sin", 3, scala.math.sin)
+    case "cos"            => UnOperator("cos", 3, scala.math.cos)
   }
 
   def split(exp: String, f: Char => (Int, Boolean)): List[String] = {
@@ -58,24 +58,7 @@ object Calculator extends App {
   }
 
   def eval(exp: String): List[Token] = {
-    val parsed = split(expression, tokenize).collect(inter)
-    def run(rest: List[Token], stack: List[Operator], output: List[Token]): List[Token] =
-      if (rest.isEmpty) output ++ stack
-    else rest.head match {
-      case dig: Digit => run(rest.tail, stack, output :+ dig)
-      case op: BiOperator =>
-        if (stack.nonEmpty && stack.last.priority < op.priority)
-          run(rest.tail, Nil, output ++ stack)
-        else
-          run(rest.tail, op :: stack, output)
-      case op: UnOperator =>
-          run(rest.tail, op :: stack, output)
-      case op: OpenedBracket.type =>
-          run(rest.tail, op :: stack, output)
-      case op: ClosedBracket.type =>
-          run(rest.tail, op :: stack, output)
-    }
-    run(parsed, Nil, Nil)
+    split(expression, tokenize).collect(inter)
   }
 
   println(eval(expression))
