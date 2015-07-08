@@ -5,59 +5,61 @@ package org.gemini.scala.labs
  */
 object Evaluate extends App {
 
-  val expression = "12 + 7"
+  val expression = "10 + 15 * 2"
 
-  def isOperator(op: String) = op match {
-    case "+" | "-" | "*" | "/" => true
-    case _ => false
+  abstract class Token
+
+  case class Operand(value: String) extends Token {
+    def add(other: Char): Operand = Operand(value + other)
+    def calc: Double = value.toDouble
+    override def toString: String = value
   }
 
-  def isDigit(that: String): Boolean = that.forall(c => c.isDigit || c == '.')
-
-  def priority(op: String) = op match {
-    case "*" | "/" => 2
-    case "+" | "-" => 3
-  }
-
-  def op(op: String)(x: Double, y: Double) = op match {
-    case "+" => x + y
-    case "-" => x - y
-    case "*" => x * y
-    case "/" => x / y
-  }
-
-  def parse(expression: String, output: List[String] = Nil, stack: List[String] = Nil): List[String] = {
-    if (expression.isEmpty) output ++ stack.reverseMap(_.toString)
-    else if (expression.head == ' ')
-      parse(expression.tail, output, stack)
-    else
-      if (expression.head.isDigit | expression.head == '.')
-//        if (output.nonEmpty && isDigit(output.last))
-//          parse(expression.tail, output.init :+ (output.last + expression.head), stack)
-//        else
-          parse(expression.tail, output :+ expression.head.toString, stack)
-      else if (isOperator(expression.head.toString))
-        if (stack.nonEmpty && priority(expression.head.toString) < priority(stack.last.toString))
-          parse(expression.tail, output, stack :+ expression.head.toString)
-        else
-          parse(expression.tail, output ++ stack.reverseMap(_.toString), List(expression.head.toString))
-      else throw new ArithmeticException
-  }
-
-  def eval(expression: String): Double = {
-    val queue = parse(expression)
-    println(queue)
-    def _evaluate(rest: List[String], acc: Double, stack: List[Double]): Double = {
-      if (rest.isEmpty) acc
-      else if (isOperator(rest.head)) {
-        val r = stack.takeRight(2).reduceLeft(op(rest.head))
-        _evaluate(rest.tail, r, stack.dropRight(2) :+ r)
-      } else
-        _evaluate(rest.tail, acc, stack :+ rest.head.toDouble)
+  case class Operator(value: Char) extends Token {
+    def eval(op: List[Double]): Double = {
+      value match {
+        case '+' => op.sum
+        case '-' => op.reduceLeft(_ - _)
+        case '/' => op.reduceLeft(_ / _)
+        case '*' => op.product
+      }
     }
-    _evaluate(queue, 0, Nil)
+    def priority: Int = value match {
+      case '*' | '/' => 1
+      case '+' | '-' => 2
+    }
+    override def toString: String = value.toString
   }
 
-  println(eval(expression))
+
+  def parse(exp: String, acc: List[Token] = Nil, stack: List[Operator] = Nil): List[Token] = {
+    if (exp.isEmpty) acc ++ stack.reverse
+    else if (exp.head == ' ')
+      parse(exp.tail, acc, stack)
+    else if (exp.head.isDigit || exp.head == '.')
+      if (acc.nonEmpty && acc.last.isInstanceOf[Operand])
+        parse(exp.tail, acc.init :+ acc.last.asInstanceOf[Operand].add(exp.head), stack)
+      else
+        parse(exp.tail, acc :+ Operand(exp.head.toString), stack)
+    else
+      if (stack.nonEmpty && Operator(exp.head).priority > stack.last.priority)
+        parse(exp.tail, acc ++ stack.reverse, List(Operator(exp.head)))
+      else
+        parse(exp.tail, acc :+ Operand(""), stack :+ Operator(exp.head))
+
+  }
+
+  def eval(tokens: List[Token], stack: List[Double] = Nil): Double = {
+    if (tokens.isEmpty) stack.last
+    else tokens.head match {
+      case operand: Operand =>
+        eval(tokens.tail, stack :+ operand.calc)
+      case operator: Operator =>
+        eval(tokens.tail, stack.dropRight(2) :+ operator.eval(stack.takeRight(2)))
+    }
+
+  }
+
+  println(eval(parse(expression)))
 
 }
