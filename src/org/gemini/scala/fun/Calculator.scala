@@ -13,17 +13,12 @@ object Helper {
 object Calculator extends App {
 
   abstract class Token
-
   abstract class Operation(val priority: Int) extends Token
 
   case class BinaryOperator(override val priority: Int, calc: (Double, Double) => Double) extends Operation(priority)
-
   case class UnaryOperator(override val priority: Int, calc: Double => Double) extends Operation(priority)
-
   case object ClosedBracket extends Token
-
   case object OpenedBracket extends Token
-
   case class Digit(value: Double) extends Token
 
   case class Output(values: List[Double] = Nil) {
