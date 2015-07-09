@@ -94,7 +94,7 @@ object Calculator extends App {
           _split(rest.tail, acc :+ rest.head.toString, t)
       }
     }
-    _split(exp).filterNot(_.forall(_.isSpaceChar))
+    _split(exp).filterNot(isEmpty)
   }
 
   private def reduce(container: Container, token: Token): Container = token match {
