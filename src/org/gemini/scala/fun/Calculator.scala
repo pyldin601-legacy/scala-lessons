@@ -1,14 +1,11 @@
 package org.gemini.scala.fun
 
-import java.util.function.BinaryOperator
-
 /**
  * Created by Roman on 08.07.2015
  */
 
 object Helper {
   def isNumber(exp: String): Boolean = exp.forall(c => c.isDigit || c == '.')
-
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
 }
 
