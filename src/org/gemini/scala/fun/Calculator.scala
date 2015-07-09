@@ -1,12 +1,14 @@
 package org.gemini.scala.fun
 
+import scala.language.postfixOps
+
 /**
  * Created by Roman on 08.07.2015
  */
 
 object Helper {
-  def isNumber(exp: String): Boolean = exp.forall(c => c.isDigit || c == '.')
-
+  def isNumber(exp: String): Boolean =
+    exp.forall(c => c.isDigit || c == '.') && !(exp.count('.' ==) > 1)
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
 }
 
