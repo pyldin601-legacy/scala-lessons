@@ -85,11 +85,12 @@ object Calculator extends App {
       case o: OpenedBracket.type =>
         arrange(exp.tail, o :: stack, output)
       case c: ClosedBracket.type =>
-        val fork = stack.indexOf(OpenedBracket)
-        if (fork == -1)
+        if (stack.isEmpty)
           throw new ArithmeticException("Unclosed bracket")
+        if (stack.head == OpenedBracket)
+          arrange(exp.tail, stack.tail, output)
         else
-          arrange(exp.tail, stack.drop(fork + 1), output ++ stack.take(fork))
+          arrange(exp, stack.tail, output :+ stack.head)
       case x =>
         throw new UnsupportedOperationException("Unknown operation - " + x)
     }
