@@ -22,10 +22,8 @@ object Calculator extends App {
   case class Digit(value: Double) extends Token
 
   case class Output(values: List[Double] = Nil) {
-    def add(digit: Digit): Output = {
-      Output(values :+ digit.value)
-    }
-    def apply(op: Operation): Output = {
+    def add(digit: Digit) = Output(values :+ digit.value)
+    def apply(op: Operation) =
       op match {
         case b: BinaryOperator =>
           if (values.length < 2) throw new ArithmeticException("Not enough of operands")
@@ -34,7 +32,6 @@ object Calculator extends App {
           if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
           else Output(values.init :+ u.calc(values.last))
       }
-    }
     def result =
       if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
