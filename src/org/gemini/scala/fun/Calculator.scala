@@ -31,7 +31,7 @@ object Calculator extends App {
 
   import Helper._
 
-  def split(exp: String): List[Token] = {
+  private def split(exp: String): List[Token] = {
     val tokenize: PartialFunction[Char, (Int, Boolean)] = {
       case d if d.isDigit || d == '.' => (0, true)
       case l if l.isLetter => (1, true)
@@ -66,7 +66,7 @@ object Calculator extends App {
     run(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
   }
 
-  def arrange(exp: List[Token], stack: List[Token] = Nil, output: List[Token] = Nil): List[Token] = {
+  private def arrange(exp: List[Token], stack: List[Token] = Nil, output: List[Token] = Nil): List[Token] = {
     if (exp.isEmpty) output ++ stack
     else exp.head match {
       case d: Digit => arrange(exp.tail, stack, output :+ d)
@@ -95,7 +95,7 @@ object Calculator extends App {
     }
   }
 
-  def calc(arranged: List[Token], stack: List[Double] = Nil): Double = {
+  private def calc(arranged: List[Token], stack: List[Double] = Nil): Double = {
     if (arranged.isEmpty) stack.last
     else arranged.head match {
       case d: Digit =>
@@ -107,8 +107,8 @@ object Calculator extends App {
     }
   }
 
-  val expression = "(cos(pi * 2) + 1) ^ 8 / 4"
+  def eval(expression: String): Double = calc(arrange(split(expression)))
 
-  println(calc(arrange(split(expression))))
+  println(eval("(cos(pi * 2) + 1) ^ 8 / 4"))
 
 }
