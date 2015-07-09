@@ -7,8 +7,15 @@ package org.gemini.scala.fun
 object Helper {
   def isNumber(exp: String): Boolean = exp.forall(c => c.isDigit || c == '.')
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
+  def fact(num: Double): Double = {
+    def _fact(arg: Double, acc: Double = 1.0): Double = {
+      if (arg == 1 || arg == 0) acc
+      else if (arg < 0) throw new IllegalArgumentException
+      else _fact(arg - 1, acc * arg)
+    }
+    _fact(num)
+  }
 }
-
 
 object Calculator extends App {
 
@@ -43,6 +50,7 @@ object Calculator extends App {
       case "sin" => UnaryOperator(3, scala.math.sin)
       case "cos" => UnaryOperator(3, scala.math.cos)
       case "tan" => UnaryOperator(3, scala.math.tan)
+      case "!" => UnaryOperator(4, fact)
       case v => throw new IllegalArgumentException("Unknown constant - " + v)
     }
     def run(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
@@ -90,9 +98,12 @@ object Calculator extends App {
   def calc(arranged: List[Token], stack: List[Double] = Nil): Double = {
     if (arranged.isEmpty) stack.last
     else arranged.head match {
-      case d: Digit => calc(arranged.tail, stack :+ d.value)
-      case o: BinaryOperator => calc(arranged.tail, stack.dropRight(2) :+ stack.takeRight(2).reduce(o.calc))
-      case f: UnaryOperator => calc(arranged.tail, stack.init :+ f.calc(stack.last))
+      case d: Digit =>
+        calc(arranged.tail, stack :+ d.value)
+      case o: BinaryOperator =>
+        calc(arranged.tail, stack.dropRight(2) :+ stack.takeRight(2).reduce(o.calc))
+      case f: UnaryOperator =>
+        calc(arranged.tail, stack.init :+ f.calc(stack.last))
     }
   }
 
