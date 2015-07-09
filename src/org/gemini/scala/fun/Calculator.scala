@@ -1,5 +1,7 @@
 package org.gemini.scala.fun
 
+import java.util.function.BinaryOperator
+
 /**
  * Created by Roman on 08.07.2015
  */
@@ -10,31 +12,20 @@ object Helper {
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
 }
 
+
 object Calculator extends App {
 
-  import Helper._
-
   abstract class Token
-  
+  abstract class Operation(val priority: Int) extends Token
+
+  case class BinaryOperator(override val priority: Int, calc: (Double, Double) => Double) extends Operation(priority)
+  case class UnaryOperator(override val priority: Int, calc: Double => Double) extends Operation(priority)
+
   case object ClosedBracket extends Token
-
   case object OpenedBracket extends Token
-
   case class Digit(value: Double) extends Token
 
-  class Operation(val priority: Int) extends Token
-
-  abstract class BinaryOperator(override val priority: Int, val calc: (Double, Double) => Double) extends Operation(priority)
-
-  abstract class UnaryOperator(override val priority: Int, val calc: Double => Double) extends Operation(priority)
-
-  case class LoOperator(override val calc: (Double, Double) => Double) extends BinaryOperator(0, calc)
-
-  case class MiOperator(override val calc: (Double, Double) => Double) extends BinaryOperator(1, calc)
-
-  case class HiOperator(override val calc: (Double, Double) => Double) extends BinaryOperator(2, calc)
-
-  case class MathFunction(override val calc: Double => Double) extends UnaryOperator(3, calc)
+  import Helper._
 
   def split(exp: String): List[Token] = {
     val tokenize: PartialFunction[Char, (Int, Boolean)] = {
@@ -44,17 +35,17 @@ object Calculator extends App {
     }
     val inter: PartialFunction[String, Token] = {
       case d if isNumber(d) => Digit(d.toDouble)
+      case "pi" => Digit(scala.math.Pi)
       case "(" => OpenedBracket
       case ")" => ClosedBracket
-      case "+" => LoOperator(_ + _)
-      case "-" => LoOperator(_ - _)
-      case "*" => MiOperator(_ * _)
-      case "/" => MiOperator(_ / _)
-      case "^" => HiOperator(scala.math.pow)
-      case "sin" => MathFunction(scala.math.sin)
-      case "cos" => MathFunction(scala.math.cos)
-      case "tan" => MathFunction(scala.math.tan)
-      case "pi" => Digit(scala.math.Pi)
+      case "+" => BinaryOperator(0, _ + _)
+      case "-" => BinaryOperator(0, _ - _)
+      case "*" => BinaryOperator(1, _ * _)
+      case "/" => BinaryOperator(1, _ / _)
+      case "^" => BinaryOperator(2, scala.math.pow)
+      case "sin" => UnaryOperator(3, scala.math.sin)
+      case "cos" => UnaryOperator(3, scala.math.cos)
+      case "tan" => UnaryOperator(3, scala.math.tan)
       case v => throw new IllegalArgumentException("Unknown constant - " + v)
     }
     def run(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
@@ -104,7 +95,7 @@ object Calculator extends App {
     else arranged.head match {
       case d: Digit => calc(arranged.tail, stack :+ d.value)
       case o: BinaryOperator => calc(arranged.tail, stack.dropRight(2) :+ stack.takeRight(2).reduce(o.calc))
-      case f: MathFunction => calc(arranged.tail, stack.init :+ f.calc(stack.last))
+      case f: UnaryOperator => calc(arranged.tail, stack.init :+ f.calc(stack.last))
     }
   }
 
