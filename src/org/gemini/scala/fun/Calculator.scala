@@ -31,10 +31,23 @@ object Calculator extends App {
         case u: UnaryOperator =>
           if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
           else Output(values.init :+ u.calc(values.last))
+        case _ =>
+          throw new UnsupportedOperationException
       }
     def result =
       if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
+  }
+
+  case class Container(output: Output = new Output(), stack: List[Token] = Nil) {
+    def stackIsEmpty = stack.isEmpty
+    def lastIsOperation = stack.head.isInstanceOf[Operation]
+    def lastOperation = stack.head.asInstanceOf[Operation]
+    def result: Double =
+      if (stack.forall(_.isInstanceOf[Operation]))
+        stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
+      else
+        throw new ArithmeticException
   }
 
   import Helper._
@@ -74,41 +87,36 @@ object Calculator extends App {
     _split(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
   }
 
-  private def calc(exp: List[Token], stack: List[Token] = Nil, output: Output = new Output()): Double = {
-    if (exp.isEmpty && stack.nonEmpty)
-      stack.head match {
-        case operation: Operation => calc(exp, stack.tail, output apply operation)
-        case _ => throw new ArithmeticException("Opened bracket has no pair")
-      }
-    else if (exp.isEmpty)
-      output.result
-    else exp.head match {
-      case d: Digit => calc(exp.tail, stack, output add d)
+  private def reduce(container: Container, token: Token): Container = {
+    token match {
+      case d: Digit => container.copy(output = container.output add d)
       case o: Operation =>
-        if (stack.nonEmpty && stack.head.isInstanceOf[Operation])
-          stack.head.asInstanceOf[Operation] match {
-            case l if l.priority > o.priority =>
-              calc(exp, stack.tail, output apply l)
+        if (container.stack.nonEmpty && container.lastIsOperation)
+          container.lastOperation match {
+            case l if l.priority > o.priority => reduce(
+              container.copy(container.output.apply(l), container.stack.tail), token)
             case l =>
-              calc(exp.tail, l :: stack, output)
+              container.copy(stack = l :: container.stack)
           }
         else
-          calc(exp.tail, exp.head :: stack, output)
+          container.copy(stack = o :: container.stack)
       case o: OpenedBracket.type =>
-        calc(exp.tail, o :: stack, output)
+        container.copy(stack = o :: container.stack)
       case c: ClosedBracket.type =>
-        if (stack.isEmpty)
+        if (container.stackIsEmpty)
           throw new ArithmeticException("Closed bracket has no pair")
-        if (stack.head == OpenedBracket)
-          calc(exp.tail, stack.tail, output)
+        if (container.stack.head == OpenedBracket)
+          container.copy(stack = container.stack.tail)
         else
-          calc(exp, stack.tail, output apply stack.head.asInstanceOf[Operation])
+          reduce(Container(container.output.apply(container.lastOperation),
+            container.stack.tail), token)
       case x =>
         throw new UnsupportedOperationException("Unknown operation - " + x)
     }
   }
 
-  def eval(expression: String): String = expression + " = " + calc(split(expression))
+  def eval(expression: String): String =
+    expression + " = " + split(expression).foldLeft(Container())(reduce).result
 
   println(eval("sqrt((cos(pi * 2) + 1) ^ 8 / 4)"))
 
