@@ -47,7 +47,7 @@ object Calculator extends App {
       if (stack.forall(_.isInstanceOf[Operation]))
         stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
       else
-        throw new ArithmeticException
+        throw new ArithmeticException("Closed bracket has no pair")
   }
 
   import Helper._
