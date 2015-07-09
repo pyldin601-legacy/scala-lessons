@@ -58,6 +58,7 @@ object Calculator extends App {
       case "sin" => UnaryOperator(3, scala.math.sin)
       case "cos" => UnaryOperator(3, scala.math.cos)
       case "tan" => UnaryOperator(3, scala.math.tan)
+      case "sqrt" => UnaryOperator(3, scala.math.sqrt)
       case v => throw new IllegalArgumentException("Unknown constant - " + v)
     }
     def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
@@ -74,17 +75,18 @@ object Calculator extends App {
   }
 
   private def calc(exp: List[Token], stack: List[Token] = Nil, output: Output = new Output()): Double = {
-    if (exp.isEmpty && stack.length != 1)
-      throw new ArithmeticException("No more numbers to apply operation")
+    if (exp.isEmpty && stack.nonEmpty)
+      stack.head match {
+        case operation: Operation => calc(exp, stack.tail, output apply operation)
+        case _ => throw new ArithmeticException("Opened bracket has no pair")
+      }
     else if (exp.isEmpty)
-      output.apply(stack.head.asInstanceOf[Operation]).result
+      output.result
     else exp.head match {
       case d: Digit => calc(exp.tail, stack, output add d)
       case o: Operation =>
         if (stack.nonEmpty && stack.head.isInstanceOf[Operation])
           stack.head.asInstanceOf[Operation] match {
-            case l if l.priority == o.priority =>
-              calc(exp.tail, o :: stack.tail, output apply l)
             case l if l.priority > o.priority =>
               calc(exp, stack.tail, output apply l)
             case l =>
@@ -96,7 +98,7 @@ object Calculator extends App {
         calc(exp.tail, o :: stack, output)
       case c: ClosedBracket.type =>
         if (stack.isEmpty)
-          throw new ArithmeticException("Unclosed bracket")
+          throw new ArithmeticException("Closed bracket has no pair")
         if (stack.head == OpenedBracket)
           calc(exp.tail, stack.tail, output)
         else
@@ -108,6 +110,6 @@ object Calculator extends App {
 
   def eval(expression: String): String = expression + " = " + calc(split(expression))
 
-  println(eval("(cos(pi * 2) + 1) ^ 8 / 4"))
+  println(eval("sqrt((cos(pi * 2) + 1) ^ 8 / 4)"))
 
 }
