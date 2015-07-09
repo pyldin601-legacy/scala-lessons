@@ -6,23 +6,29 @@ package org.gemini.scala.fun
 
 object Helper {
   def isNumber(exp: String): Boolean = exp.forall(c => c.isDigit || c == '.')
+
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
 }
 
 object Calculator extends App {
 
   abstract class Token
+
   abstract class Operation(val priority: Int) extends Token
 
   case class BinaryOperator(override val priority: Int, calc: (Double, Double) => Double) extends Operation(priority)
+
   case class UnaryOperator(override val priority: Int, calc: Double => Double) extends Operation(priority)
 
   case object ClosedBracket extends Token
+
   case object OpenedBracket extends Token
+
   case class Digit(value: Double) extends Token
 
   case class Output(values: List[Double] = Nil) {
     def add(digit: Digit) = Output(values :+ digit.value)
+
     def apply(op: Operation) =
       op match {
         case b: BinaryOperator =>
@@ -34,6 +40,7 @@ object Calculator extends App {
         case _ =>
           throw new UnsupportedOperationException
       }
+
     def result =
       if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
@@ -41,8 +48,11 @@ object Calculator extends App {
 
   case class Container(output: Output = new Output(), stack: List[Token] = Nil) {
     def stackIsEmpty = stack.isEmpty
+
     def lastIsOperation = stack.head.isInstanceOf[Operation]
+
     def lastOperation = stack.head.asInstanceOf[Operation]
+
     def result: Double =
       if (stack.forall(_.isInstanceOf[Operation]))
         stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
@@ -87,33 +97,32 @@ object Calculator extends App {
     _split(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
   }
 
-  private def reduce(container: Container, token: Token): Container = {
-    token match {
-      case d: Digit => container.copy(output = container.output add d)
-      case o: Operation =>
-        if (container.stack.nonEmpty && container.lastIsOperation)
-          container.lastOperation match {
-            case l if l.priority > o.priority => reduce(
-              container.copy(container.output.apply(l), container.stack.tail), token)
-            case l =>
-              container.copy(stack = l :: container.stack)
-          }
-        else
-          container.copy(stack = o :: container.stack)
-      case o: OpenedBracket.type =>
+  private def reduce(container: Container, token: Token): Container = token match {
+    case d: Digit => container.copy(output = container.output add d)
+    case o: Operation =>
+      if (container.stack.nonEmpty && container.lastIsOperation)
+        container.lastOperation match {
+          case l if l.priority > o.priority => reduce(
+            container.copy(container.output.apply(l), container.stack.tail), token)
+          case l =>
+            container.copy(stack = l :: container.stack)
+        }
+      else
         container.copy(stack = o :: container.stack)
-      case c: ClosedBracket.type =>
-        if (container.stackIsEmpty)
-          throw new ArithmeticException("Closed bracket has no pair")
-        if (container.stack.head == OpenedBracket)
-          container.copy(stack = container.stack.tail)
-        else
-          reduce(Container(container.output.apply(container.lastOperation),
-            container.stack.tail), token)
-      case x =>
-        throw new UnsupportedOperationException("Unknown operation - " + x)
-    }
+    case o: OpenedBracket.type =>
+      container.copy(stack = o :: container.stack)
+    case c: ClosedBracket.type =>
+      if (container.stackIsEmpty)
+        throw new ArithmeticException("Closed bracket has no pair")
+      if (container.stack.head == OpenedBracket)
+        container.copy(stack = container.stack.tail)
+      else
+        reduce(Container(container.output.apply(container.lastOperation),
+          container.stack.tail), token)
+    case x =>
+      throw new UnsupportedOperationException("Unknown operation - " + x)
   }
+
 
   def eval(expression: String): String =
     expression + " = " + split(expression).foldLeft(Container())(reduce).result
