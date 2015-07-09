@@ -109,9 +109,9 @@ object Calculator extends App {
         }
       else
         container.copy(stack = o :: container.stack)
-    case o: OpenedBracket.type =>
-      container.copy(stack = o :: container.stack)
-    case c: ClosedBracket.type =>
+    case OpenedBracket =>
+      container.copy(stack = OpenedBracket :: container.stack)
+    case ClosedBracket =>
       if (container.stackIsEmpty)
         throw new ArithmeticException("Closed bracket has no pair")
       if (container.stack.head == OpenedBracket)
