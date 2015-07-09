@@ -29,6 +29,25 @@ object Calculator extends App {
   case object OpenedBracket extends Token
   case class Digit(value: Double) extends Token
 
+  case class Output(values: List[Double] = Nil) {
+    def add(digit: Digit): Output = {
+      Output(values :+ digit.value)
+    }
+    def apply(op: Operation): Output = {
+      op match {
+        case b: BinaryOperator =>
+          if (values.length < 2) throw new ArithmeticException
+          else Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
+        case u: UnaryOperator =>
+          if (values.isEmpty) throw new ArithmeticException
+          else Output(values.init :+ u.calc(values.last))
+      }
+    }
+    def result =
+      if (values.length != 1) throw new ArithmeticException
+      else values.head
+  }
+
   import Helper._
 
   private def split(exp: String): List[Token] = {
@@ -53,62 +72,52 @@ object Calculator extends App {
       case "!" => UnaryOperator(4, fact)
       case v => throw new IllegalArgumentException("Unknown constant - " + v)
     }
-    def run(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
+    def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
       if (rest.isEmpty) acc
       else {
         val (t, j) = tokenize(rest.head)
         if (acc.nonEmpty && t == last && j)
-          run(rest.tail, acc.init :+ (acc.last + rest.head), last)
+          _split(rest.tail, acc.init :+ (acc.last + rest.head), last)
         else
-          run(rest.tail, acc :+ rest.head.toString, t)
+          _split(rest.tail, acc :+ rest.head.toString, t)
       }
     }
-    run(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
+    _split(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
   }
 
-  private def arrange(exp: List[Token], stack: List[Token] = Nil, output: List[Token] = Nil): List[Token] = {
-    if (exp.isEmpty) output ++ stack
+  private def calc(exp: List[Token], stack: List[Token] = Nil, output: Output = new Output()): Double = {
+    if (exp.isEmpty && stack.length != 1) throw new ArithmeticException()
+    else if (exp.isEmpty)
+      output.apply(stack.head.asInstanceOf[Operation]).result
     else exp.head match {
-      case d: Digit => arrange(exp.tail, stack, output :+ d)
+      case d: Digit => calc(exp.tail, stack, output add d)
       case o: Operation =>
         if (stack.nonEmpty && stack.head.isInstanceOf[Operation])
           stack.head.asInstanceOf[Operation] match {
             case l if l.priority == o.priority =>
-              arrange(exp.tail, o :: stack.tail, output :+ stack.head)
+              calc(exp.tail, o :: stack.tail, output apply l)
             case l if l.priority > o.priority =>
-              arrange(exp, stack.tail, output :+ stack.head)
+              calc(exp, stack.tail, output apply l)
             case l =>
-              arrange(exp.tail, l :: stack, output)
+              calc(exp.tail, l :: stack, output)
           }
         else
-          arrange(exp.tail, exp.head :: stack, output)
+          calc(exp.tail, exp.head :: stack, output)
       case o: OpenedBracket.type =>
-        arrange(exp.tail, o :: stack, output)
+        calc(exp.tail, o :: stack, output)
       case c: ClosedBracket.type =>
         if (stack.isEmpty)
           throw new ArithmeticException("Unclosed bracket")
         if (stack.head == OpenedBracket)
-          arrange(exp.tail, stack.tail, output)
+          calc(exp.tail, stack.tail, output)
         else
-          arrange(exp, stack.tail, output :+ stack.head)
+          calc(exp, stack.tail, output apply stack.head.asInstanceOf[Operation])
       case x =>
         throw new UnsupportedOperationException("Unknown operation - " + x)
     }
   }
 
-  private def calc(arranged: List[Token], stack: List[Double] = Nil): Double = {
-    if (arranged.isEmpty) stack.last
-    else arranged.head match {
-      case d: Digit =>
-        calc(arranged.tail, stack :+ d.value)
-      case o: BinaryOperator =>
-        calc(arranged.tail, stack.dropRight(2) :+ stack.takeRight(2).reduce(o.calc))
-      case f: UnaryOperator =>
-        calc(arranged.tail, stack.init :+ f.calc(stack.last))
-    }
-  }
-
-  def eval(expression: String): Double = calc(arrange(split(expression)))
+  def eval(expression: String): Double = calc(split(expression))
 
   println(eval("(cos(pi * 2) + 1) ^ 8 / 4"))
 
