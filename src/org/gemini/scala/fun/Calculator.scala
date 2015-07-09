@@ -62,28 +62,30 @@ object Calculator extends App {
 
   import Helper._
 
-  private def split(exp: String): List[Token] = {
+  private def inter: PartialFunction[String, Token] = {
+    case d if isNumber(d) => Digit(d.toDouble)
+    case "pi" => Digit(scala.math.Pi)
+    case "(" => OpenedBracket
+    case ")" => ClosedBracket
+    case "+" => BinaryOperator(0, _ + _)
+    case "-" => BinaryOperator(0, _ - _)
+    case "*" => BinaryOperator(1, _ * _)
+    case "/" => BinaryOperator(1, _ / _)
+    case "^" => BinaryOperator(2, scala.math.pow)
+    case "sin" => UnaryOperator(3, scala.math.sin)
+    case "cos" => UnaryOperator(3, scala.math.cos)
+    case "tan" => UnaryOperator(3, scala.math.tan)
+    case "sqrt" => UnaryOperator(3, scala.math.sqrt)
+    case v => throw new IllegalArgumentException("Unknown constant - " + v)
+  }
+
+  private def split(exp: String): List[String] = {
     val tokenize: PartialFunction[Char, (Int, Boolean)] = {
       case d if d.isDigit || d == '.' => (0, true)
       case l if l.isLetter => (1, true)
       case _ => (2, false)
     }
-    val inter: PartialFunction[String, Token] = {
-      case d if isNumber(d) => Digit(d.toDouble)
-      case "pi" => Digit(scala.math.Pi)
-      case "(" => OpenedBracket
-      case ")" => ClosedBracket
-      case "+" => BinaryOperator(0, _ + _)
-      case "-" => BinaryOperator(0, _ - _)
-      case "*" => BinaryOperator(1, _ * _)
-      case "/" => BinaryOperator(1, _ / _)
-      case "^" => BinaryOperator(2, scala.math.pow)
-      case "sin" => UnaryOperator(3, scala.math.sin)
-      case "cos" => UnaryOperator(3, scala.math.cos)
-      case "tan" => UnaryOperator(3, scala.math.tan)
-      case "sqrt" => UnaryOperator(3, scala.math.sqrt)
-      case v => throw new IllegalArgumentException("Unknown constant - " + v)
-    }
+
     def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
       if (rest.isEmpty) acc
       else {
@@ -94,7 +96,7 @@ object Calculator extends App {
           _split(rest.tail, acc :+ rest.head.toString, t)
       }
     }
-    _split(exp).filterNot(_.forall(_.isSpaceChar)).map(inter)
+    _split(exp).filterNot(_.forall(_.isSpaceChar))
   }
 
   private def reduce(container: Container, token: Token): Container = token match {
@@ -125,7 +127,7 @@ object Calculator extends App {
 
 
   def eval(expression: String): String =
-    expression + " = " + split(expression).foldLeft(Container())(reduce).result
+    expression + " = " + split(expression).map(inter).foldLeft(Container())(reduce).result
 
   println(eval("sqrt((cos(pi * 2) + 1) ^ 8 / 4)"))
 
