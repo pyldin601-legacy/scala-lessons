@@ -7,14 +7,6 @@ package org.gemini.scala.fun
 object Helper {
   def isNumber(exp: String): Boolean = exp.forall(c => c.isDigit || c == '.')
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
-  def fact(num: Double): Double = {
-    def _fact(arg: Double, acc: Double = 1.0): Double = {
-      if (arg == 1 || arg == 0) acc
-      else if (arg < 0) throw new IllegalArgumentException
-      else _fact(arg - 1, acc * arg)
-    }
-    _fact(num)
-  }
 }
 
 object Calculator extends App {
@@ -36,15 +28,15 @@ object Calculator extends App {
     def apply(op: Operation): Output = {
       op match {
         case b: BinaryOperator =>
-          if (values.length < 2) throw new ArithmeticException
+          if (values.length < 2) throw new ArithmeticException("Not enough of operands")
           else Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
         case u: UnaryOperator =>
-          if (values.isEmpty) throw new ArithmeticException
+          if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
           else Output(values.init :+ u.calc(values.last))
       }
     }
     def result =
-      if (values.length != 1) throw new ArithmeticException
+      if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
   }
 
@@ -69,7 +61,6 @@ object Calculator extends App {
       case "sin" => UnaryOperator(3, scala.math.sin)
       case "cos" => UnaryOperator(3, scala.math.cos)
       case "tan" => UnaryOperator(3, scala.math.tan)
-      case "!" => UnaryOperator(4, fact)
       case v => throw new IllegalArgumentException("Unknown constant - " + v)
     }
     def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
@@ -86,7 +77,8 @@ object Calculator extends App {
   }
 
   private def calc(exp: List[Token], stack: List[Token] = Nil, output: Output = new Output()): Double = {
-    if (exp.isEmpty && stack.length != 1) throw new ArithmeticException()
+    if (exp.isEmpty && stack.length != 1)
+      throw new ArithmeticException("No more numbers to apply operation")
     else if (exp.isEmpty)
       output.apply(stack.head.asInstanceOf[Operation]).result
     else exp.head match {
@@ -117,7 +109,7 @@ object Calculator extends App {
     }
   }
 
-  def eval(expression: String): Double = calc(split(expression))
+  def eval(expression: String): String = expression + " = " + calc(split(expression))
 
   println(eval("(cos(pi * 2) + 1) ^ 8 / 4"))
 
