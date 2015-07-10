@@ -26,7 +26,6 @@ object Calculator extends App {
 
   case class Output(values: List[Double] = Nil) {
     def add(digit: Digit) = Output(values :+ digit.value)
-
     def apply(op: Operation) =
       op match {
         case b: BinaryOperator =>
@@ -38,7 +37,6 @@ object Calculator extends App {
         case _ =>
           throw new UnsupportedOperationException
       }
-
     def result =
       if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
@@ -46,11 +44,8 @@ object Calculator extends App {
 
   case class Container(output: Output = new Output(), stack: List[Token] = Nil) {
     def stackIsEmpty = stack.isEmpty
-
     def lastIsOperation = stack.head.isInstanceOf[Operation]
-
     def lastOperation = stack.head.asInstanceOf[Operation]
-
     def result: Double =
       if (stack.forall(_.isInstanceOf[Operation]))
         stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
@@ -70,6 +65,7 @@ object Calculator extends App {
     case "*" => BinaryOperator(1, _ * _)
     case "/" => BinaryOperator(1, _ / _)
     case "^" => BinaryOperator(2, scala.math.pow)
+    case "inv" => UnaryOperator(3, v => -v)
     case "sin" => UnaryOperator(3, scala.math.sin)
     case "cos" => UnaryOperator(3, scala.math.cos)
     case "tan" => UnaryOperator(3, scala.math.tan)
@@ -77,13 +73,13 @@ object Calculator extends App {
     case v => throw new IllegalArgumentException("Unknown constant - " + v)
   }
 
-  private def split(exp: String): List[String] = {
-    val tokenize: PartialFunction[Char, (Int, Boolean)] = {
-      case d if d.isDigit || d == '.' => (0, true)
-      case l if l.isLetter => (1, true)
-      case _ => (2, false)
-    }
+  def tokenize: PartialFunction[Char, (Int, Boolean)] = {
+    case d if d.isDigit || d == '.' => (0, true)
+    case l if l.isLetter => (1, true)
+    case _ => (2, false)
+  }
 
+  private def split(exp: String): List[String] = {
     def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
       if (rest.isEmpty) acc
       else {
@@ -127,6 +123,6 @@ object Calculator extends App {
   def eval(expression: String): String =
     expression + " = " + split(expression).map(inter).foldLeft(Container())(reduce).result
 
-  println(eval("sqrt((cos(pi * 2) + 1) ^ 8 / 4)"))
+  println(eval("inv(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
 }
