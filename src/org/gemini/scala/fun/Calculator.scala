@@ -23,7 +23,9 @@ object Calculator extends App {
   case class Digit(value: Double) extends Token
 
   case class Output(values: List[Double] = Nil) {
-    def add(digit: Digit) = Output(values :+ digit.value)
+    def add(digit: Digit) = {
+      Output(values :+ digit.value)
+    }
     def apply(op: Operation) = {
       op match {
         case b: BinaryOperator =>
@@ -107,30 +109,33 @@ object Calculator extends App {
     _split(exp).filterNot(isEmpty)
   }
 
-  private def calc(container: Container, token: Token): Container = token match {
-    case d: Digit => container.copy(output = container.output add d)
-    case o: Operation =>
-      if (container.stack.nonEmpty && container.lastIsOperation)
-        container.lastOperation match {
-          case l if l.priority > o.priority => calc(
-            container.copy(container.output.apply(l), container.stack.tail), token)
-          case l =>
-            container.copy(stack = l :: container.stack)
-        }
-      else
-        container.copy(stack = o :: container.stack)
-    case OpenedBracket =>
-      container.copy(stack = OpenedBracket :: container.stack)
-    case ClosedBracket =>
-      if (container.stackIsEmpty)
-        throw new ArithmeticException("Closed bracket has no pair")
-      if (container.stack.head == OpenedBracket)
-        container.copy(stack = container.stack.tail)
-      else
-        calc(Container(container.output.apply(container.lastOperation),
-          container.stack.tail), token)
-    case x =>
-      throw new UnsupportedOperationException("Unknown operation - " + x)
+  private def calc(container: Container, token: Token): Container = {
+    println(container, token)
+    token match {
+      case d: Digit => container.copy(output = container.output add d)
+      case o: Operation =>
+        if (container.stack.nonEmpty && container.lastIsOperation)
+          container.lastOperation match {
+            case l if l.priority > o.priority => calc(
+              Container(container.output.apply(l), container.stack.tail), token)
+            case l =>
+              container.copy(stack = o :: container.stack)
+          }
+        else
+          container.copy(stack = o :: container.stack)
+      case OpenedBracket =>
+        container.copy(stack = OpenedBracket :: container.stack)
+      case ClosedBracket =>
+        if (container.stackIsEmpty)
+          throw new ArithmeticException("Closed bracket has no pair")
+        if (container.stack.head == OpenedBracket)
+          container.copy(stack = container.stack.tail)
+        else
+          calc(Container(container.output.apply(container.lastOperation),
+            container.stack.tail), token)
+      case x =>
+        throw new UnsupportedOperationException("Unknown operation - " + x)
+    }
   }
 
   def eval(expression: String): String = {
@@ -140,7 +145,7 @@ object Calculator extends App {
 
   def interact(): Unit = {
     val in = scala.io.StdIn.readLine("Expression: ")
-    if (in.isEmpty) return
+    if (in == null || in.isEmpty) return
     try {
       println(eval(in))
     } catch {
@@ -149,12 +154,13 @@ object Calculator extends App {
     interact()
   }
 
+  println("Type mathematical expression and press ENTER to evaluate or use blank line to exit")
+  println("Available operators and functions: + - / * ^ sin cos tan sqrt")
+  println()
   println("Examples:")
   println(eval("4 ^ (-5)"))
   println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
   println()
-  println("Type mathematical expression and press ENTER to evaluate or use blank line to exit")
-  println("Available operators and functions: + - / * ^ sin cos tan sqrt")
 
   interact()
 
