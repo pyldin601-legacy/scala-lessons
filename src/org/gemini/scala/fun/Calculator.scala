@@ -55,7 +55,7 @@ object Calculator extends App {
       if (stack.contains(OpenedBracket))
         throw new ArithmeticException("Opened bracket has no pair")
       else
-        stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
+        stack.collect({ case op: Operation => op }).foldLeft(output)(_ apply _).result
     }
   }
 
