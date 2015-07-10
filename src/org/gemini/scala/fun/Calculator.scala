@@ -128,6 +128,8 @@ object Calculator extends App {
     tokens.reduce((t1, t2) => {
       if (t1.isInstanceOf[Operation] && t2.isInstanceOf[Operation])
         throw new ArithmeticException("Two operators in succession")
+      else if (t1 == OpenedBracket && t2 == ClosedBracket)
+        throw new ArithmeticException("Empty brackets")
       else t2
     })
     expression + " = " + tokens.foldLeft(Container())(calc).result
