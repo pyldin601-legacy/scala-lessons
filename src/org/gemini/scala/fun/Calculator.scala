@@ -1,7 +1,5 @@
 package org.gemini.scala.fun
 
-import scala.language.postfixOps
-
 /**
  * Created by Roman on 08.07.2015
  */
@@ -32,7 +30,7 @@ object Calculator extends App {
           if (values.length >= 2)
             Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
           else if (values.length == 1 && b.priority == 0)
-            Output((values init) :+ b.calc(0, values last))
+            Output(values.init :+ b.calc(0, values.last))
           else
             throw new ArithmeticException("Not enough of operands")
         case u: UnaryOperator =>
