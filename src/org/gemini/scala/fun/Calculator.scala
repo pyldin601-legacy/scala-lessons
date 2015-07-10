@@ -138,7 +138,24 @@ object Calculator extends App {
     expression + " = " + tokens.foldLeft(Container())(calc).result
   }
 
+  def interact(): Unit = {
+    val in = scala.io.StdIn.readLine("Expression: ")
+    if (in.isEmpty) return
+    try {
+      println(eval(in))
+    } catch {
+      case e: Exception => println("Error: " + e.getMessage)
+    }
+    interact()
+  }
+
+  println("Examples:")
   println(eval("4 ^ (-5)"))
   println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
+  println()
+  println("Type mathematical expression and press ENTER to evaluate or use blank line to exit")
+  println("Available operators and functions: + - / * ^ sin cos tan sqrt")
+
+  interact()
 
 }
