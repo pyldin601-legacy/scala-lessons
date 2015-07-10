@@ -29,8 +29,6 @@ object Calculator extends App {
         case b: BinaryOperator =>
           if (values.length >= 2)
             Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
-          else if (values.length == 1 && b.priority == 0)
-            Output(values.init :+ b.calc(0, values.last))
           else
             throw new ArithmeticException("Not enough of operands")
         case u: UnaryOperator =>
@@ -59,22 +57,34 @@ object Calculator extends App {
 
   import Helper._
 
-  private def tokenize: PartialFunction[String, Token] = {
-    case d if isNumber(d) => Digit(d.toDouble)
-    case "pi" => Digit(scala.math.Pi)
-    case "(" => OpenedBracket
-    case ")" => ClosedBracket
-    case "+" => BinaryOperator(0, _ + _)
-    case "-" => BinaryOperator(0, _ - _)
-    case "*" => BinaryOperator(1, _ * _)
-    case "/" => BinaryOperator(1, _ / _)
-    case "^" => BinaryOperator(2, scala.math.pow)
-    case "inv" => UnaryOperator(3, v => -v)
-    case "sin" => UnaryOperator(3, scala.math.sin)
-    case "cos" => UnaryOperator(3, scala.math.cos)
-    case "tan" => UnaryOperator(3, scala.math.tan)
-    case "sqrt" => UnaryOperator(3, scala.math.sqrt)
-    case v => throw new IllegalArgumentException("Unknown constant - " + v)
+  private def tokenize(list: List[Token], item: String): List[Token] = {
+    val res = item match {
+      case d if isNumber(d) => Digit(d.toDouble)
+      case "pi" => Digit(scala.math.Pi)
+      case "(" => OpenedBracket
+      case ")" => ClosedBracket
+      case "+" => BinaryOperator(0, _ + _)
+      case "-" if list.isEmpty || list.last == OpenedBracket => UnaryOperator(3, -_)
+      case "-" => BinaryOperator(3, _ - _)
+      case "*" => BinaryOperator(1, _ * _)
+      case "/" => BinaryOperator(1, _ / _)
+      case "^" => BinaryOperator(2, scala.math.pow)
+      case "sin" => UnaryOperator(3, scala.math.sin)
+      case "cos" => UnaryOperator(3, scala.math.cos)
+      case "tan" => UnaryOperator(3, scala.math.tan)
+      case "sqrt" => UnaryOperator(3, scala.math.sqrt)
+      case v => throw new IllegalArgumentException("Unknown constant - " + v)
+    }
+    res match {
+      case OpenedBracket if list.nonEmpty && list.last == ClosedBracket =>
+        throw new ArithmeticException("Wrong brackets usage")
+      case ClosedBracket if list.nonEmpty && list.last == OpenedBracket =>
+        throw new ArithmeticException("Empty brackets")
+      case o: Operation if list.nonEmpty && list.last.isInstanceOf[Operation] =>
+        throw new ArithmeticException("Two operators in succession")
+      case _ =>
+    }
+    list :+ res
   }
 
   def analyzeSymbol: PartialFunction[Char, (Int, Boolean)] = {
@@ -123,21 +133,12 @@ object Calculator extends App {
       throw new UnsupportedOperationException("Unknown operation - " + x)
   }
 
-
   def eval(expression: String): String = {
-    val tokens = splitByTokens(expression).map(tokenize)
-    tokens.reduce((t1, t2) => {
-      if (t1.isInstanceOf[Operation] && t2.isInstanceOf[Operation])
-        throw new ArithmeticException("Two operators in succession")
-      else if (t1 == OpenedBracket && t2 == ClosedBracket)
-        throw new ArithmeticException("Empty brackets")
-      else if (t1 == ClosedBracket && t2 == OpenedBracket)
-        throw new ArithmeticException("Wrong brackets usage")
-      else t2
-    })
+    val tokens = splitByTokens(expression).foldLeft(List[Token]())(tokenize)
     expression + " = " + tokens.foldLeft(Container())(calc).result
   }
 
+  println(eval("4 ^ (-5)"))
   println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
 }
