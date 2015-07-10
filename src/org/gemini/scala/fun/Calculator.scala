@@ -49,7 +49,6 @@ object Calculator extends App {
     def lastIsOperation = stack.head.isInstanceOf[Operation]
     def lastOperation = stack.head.asInstanceOf[Operation]
     def result: Double = {
-      println(stack)
       if (stack.forall(_.isInstanceOf[Operation]))
         stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
       else
@@ -125,14 +124,12 @@ object Calculator extends App {
 
 
   def eval(expression: String): String = {
-    def detectPairs(t1: Token, t2: Token): Token = {
+    val tokens = splitByTokens(expression).map(tokenize)
+    tokens.reduce((t1, t2) => {
       if (t1.isInstanceOf[Operation] && t2.isInstanceOf[Operation])
         throw new ArithmeticException("Two operators in succession")
-      else
-        t2
-    }
-    val tokens = splitByTokens(expression).map(tokenize)
-    tokens reduce detectPairs
+      else t2
+    })
     expression + " = " + tokens.foldLeft(Container())(calc).result
   }
 
