@@ -8,7 +8,7 @@ import scala.language.postfixOps
 
 object Helper {
   def isNumber(exp: String): Boolean =
-    exp.forall(c => c.isDigit || c == '.') && !(exp.count('.' ==) > 1)
+    exp.forall(c => c.isDigit || c == '.') && exp.count('.' ==) == 1
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
   def isEmpty(exp: String): Boolean = exp.forall(_.isSpaceChar)
 }
