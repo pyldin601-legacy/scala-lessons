@@ -140,6 +140,6 @@ object Calculator extends App {
     expression + " = " + tokens.foldLeft(Container())(calc).result
   }
 
-  println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4)())"))
+  println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
 }
