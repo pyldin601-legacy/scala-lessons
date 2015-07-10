@@ -8,7 +8,7 @@ import scala.language.postfixOps
 
 object Helper {
   def isNumber(exp: String): Boolean =
-    exp.forall(c => c.isDigit || c == '.') && exp.count('.' ==) == 1
+    exp.forall(c => c.isDigit || c == '.') && exp.count('.' ==) <= 1
   def isWord(exp: String): Boolean = exp.forall(_.isLetter)
   def isEmpty(exp: String): Boolean = exp.forall(_.isSpaceChar)
 }
@@ -133,11 +133,13 @@ object Calculator extends App {
         throw new ArithmeticException("Two operators in succession")
       else if (t1 == OpenedBracket && t2 == ClosedBracket)
         throw new ArithmeticException("Empty brackets")
+      else if (t1 == ClosedBracket && t2 == OpenedBracket)
+        throw new ArithmeticException("Wrong brackets usage")
       else t2
     })
     expression + " = " + tokens.foldLeft(Container())(calc).result
   }
 
-  println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
+  println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4)())"))
 
 }
