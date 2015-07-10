@@ -29,7 +29,8 @@ object Calculator extends App {
     def apply(op: Operation) =
       op match {
         case b: BinaryOperator =>
-          if (values.length < 2) throw new ArithmeticException("Not enough of operands")
+          if (values.length < 1) throw new ArithmeticException("Not enough of operands")
+          else if (values.length < 2) Output((values init) :+ (List(0, values last) reduce b.calc))
           else Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
         case u: UnaryOperator =>
           if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
@@ -123,6 +124,6 @@ object Calculator extends App {
   def eval(expression: String): String =
     expression + " = " + split(expression).map(inter).foldLeft(Container())(reduce).result
 
-  println(eval("inv(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
+  println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
 }
