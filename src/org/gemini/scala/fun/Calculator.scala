@@ -110,7 +110,6 @@ object Calculator extends App {
   }
 
   private def calc(container: Container, token: Token): Container = {
-    println(container, token)
     token match {
       case d: Digit => container.copy(output = container.output add d)
       case o: Operation =>
