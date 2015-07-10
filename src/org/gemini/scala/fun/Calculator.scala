@@ -26,7 +26,7 @@ object Calculator extends App {
 
   case class Output(values: List[Double] = Nil) {
     def add(digit: Digit) = Output(values :+ digit.value)
-    def apply(op: Operation) =
+    def apply(op: Operation) = {
       op match {
         case b: BinaryOperator =>
           if (values.length >= 2) Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
@@ -38,6 +38,7 @@ object Calculator extends App {
         case _ =>
           throw new UnsupportedOperationException
       }
+    }
     def result =
       if (values.length != 1) throw new ArithmeticException("Syntax error")
       else values.head
@@ -47,16 +48,18 @@ object Calculator extends App {
     def stackIsEmpty = stack.isEmpty
     def lastIsOperation = stack.head.isInstanceOf[Operation]
     def lastOperation = stack.head.asInstanceOf[Operation]
-    def result: Double =
+    def result: Double = {
+      println(stack)
       if (stack.forall(_.isInstanceOf[Operation]))
         stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
       else
         throw new ArithmeticException("Closed bracket has no pair")
+    }
   }
 
   import Helper._
 
-  private def parseOperators: PartialFunction[String, Token] = {
+  private def tokenize: PartialFunction[String, Token] = {
     case d if isNumber(d) => Digit(d.toDouble)
     case "pi" => Digit(scala.math.Pi)
     case "(" => OpenedBracket
@@ -121,8 +124,17 @@ object Calculator extends App {
   }
 
 
-  def eval(expression: String): String =
-    expression + " = " + splitByTokens(expression).map(parseOperators).foldLeft(Container())(calc).result
+  def eval(expression: String): String = {
+    def detectPairs(t1: Token, t2: Token): Token = {
+      if (t1.isInstanceOf[Operation] && t2.isInstanceOf[Operation])
+        throw new ArithmeticException("Two operators in succession")
+      else
+        t2
+    }
+    val tokens = splitByTokens(expression).map(tokenize)
+    tokens reduce detectPairs
+    expression + " = " + tokens.foldLeft(Container())(calc).result
+  }
 
   println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
