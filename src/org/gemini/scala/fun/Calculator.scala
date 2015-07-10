@@ -29,9 +29,9 @@ object Calculator extends App {
     def apply(op: Operation) =
       op match {
         case b: BinaryOperator =>
-          if (values.length < 1) throw new ArithmeticException("Not enough of operands")
-          else if (values.length < 2) Output((values init) :+ (List(0, values last) reduce b.calc))
-          else Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
+          if (values.length >= 2) Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
+          else if (values.length < 2 && b.priority == 0) Output((values init) :+ (List(0, values last) reduce b.calc))
+          else throw new ArithmeticException("Not enough of operands")
         case u: UnaryOperator =>
           if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
           else Output(values.init :+ u.calc(values.last))
@@ -56,7 +56,7 @@ object Calculator extends App {
 
   import Helper._
 
-  private def inter: PartialFunction[String, Token] = {
+  private def parseOperators: PartialFunction[String, Token] = {
     case d if isNumber(d) => Digit(d.toDouble)
     case "pi" => Digit(scala.math.Pi)
     case "(" => OpenedBracket
@@ -74,17 +74,17 @@ object Calculator extends App {
     case v => throw new IllegalArgumentException("Unknown constant - " + v)
   }
 
-  def tokenize: PartialFunction[Char, (Int, Boolean)] = {
+  def analyzeSymbol: PartialFunction[Char, (Int, Boolean)] = {
     case d if d.isDigit || d == '.' => (0, true)
     case l if l.isLetter => (1, true)
     case _ => (2, false)
   }
 
-  private def split(exp: String): List[String] = {
+  private def splitByTokens(exp: String): List[String] = {
     def _split(rest: String, acc: List[String] = Nil, last: Int = 0): List[String] = {
       if (rest.isEmpty) acc
       else {
-        val (t, j) = tokenize(rest.head)
+        val (t, j) = analyzeSymbol(rest.head)
         if (acc.nonEmpty && t == last && j)
           _split(rest.tail, acc.init :+ (acc.last + rest.head), last)
         else
@@ -94,12 +94,12 @@ object Calculator extends App {
     _split(exp).filterNot(isEmpty)
   }
 
-  private def reduce(container: Container, token: Token): Container = token match {
+  private def calc(container: Container, token: Token): Container = token match {
     case d: Digit => container.copy(output = container.output add d)
     case o: Operation =>
       if (container.stack.nonEmpty && container.lastIsOperation)
         container.lastOperation match {
-          case l if l.priority > o.priority => reduce(
+          case l if l.priority > o.priority => calc(
             container.copy(container.output.apply(l), container.stack.tail), token)
           case l =>
             container.copy(stack = l :: container.stack)
@@ -114,7 +114,7 @@ object Calculator extends App {
       if (container.stack.head == OpenedBracket)
         container.copy(stack = container.stack.tail)
       else
-        reduce(Container(container.output.apply(container.lastOperation),
+        calc(Container(container.output.apply(container.lastOperation),
           container.stack.tail), token)
     case x =>
       throw new UnsupportedOperationException("Unknown operation - " + x)
@@ -122,7 +122,7 @@ object Calculator extends App {
 
 
   def eval(expression: String): String =
-    expression + " = " + split(expression).map(inter).foldLeft(Container())(reduce).result
+    expression + " = " + splitByTokens(expression).map(parseOperators).foldLeft(Container())(calc).result
 
   println(eval("-(sqrt((cos(pi * 2) + 1) ^ 8 / 4))"))
 
