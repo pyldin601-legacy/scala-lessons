@@ -52,10 +52,10 @@ object Calculator extends App {
     def lastIsOperation = stack.head.isInstanceOf[Operation]
     def lastOperation = stack.head.asInstanceOf[Operation]
     def result: Double = {
-      if (stack.forall(_.isInstanceOf[Operation]))
-        stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
+      if (stack.contains(OpenedBracket))
+        throw new ArithmeticException("Opened bracket has no pair")
       else
-        throw new ArithmeticException("Closed bracket has no pair")
+        stack.map(_.asInstanceOf[Operation]).foldLeft(output)(_ apply _).result
     }
   }
 
