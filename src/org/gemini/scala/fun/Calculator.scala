@@ -138,8 +138,10 @@ object Calculator extends App {
   }
 
   def eval(expression: String): String = {
-    val tokens = splitByTokens(expression).foldLeft(List[Token]())(tokenize)
-    expression + " = " + tokens.foldLeft(Container())(calc).result
+    expression + " = " + splitByTokens(expression).
+      foldLeft(List[Token]())(tokenize).
+      foldLeft(Container())(calc).
+      result
   }
 
   def interact(): Unit = {
