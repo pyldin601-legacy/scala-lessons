@@ -29,9 +29,12 @@ object Calculator extends App {
     def apply(op: Operation) = {
       op match {
         case b: BinaryOperator =>
-          if (values.length >= 2) Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
-          else if (values.length < 2 && b.priority == 0) Output((values init) :+ (List(0, values last) reduce b.calc))
-          else throw new ArithmeticException("Not enough of operands")
+          if (values.length >= 2)
+            Output((values dropRight 2) :+ ((values takeRight 2) reduce b.calc))
+          else if (values.length == 1 && b.priority == 0)
+            Output((values init) :+ (List(0, values last) reduce b.calc))
+          else
+            throw new ArithmeticException("Not enough of operands")
         case u: UnaryOperator =>
           if (values.isEmpty) throw new ArithmeticException("Not enough of operands")
           else Output(values.init :+ u.calc(values.last))
