@@ -21,8 +21,16 @@ object Stairs extends App {
   def partNumber(num: Int): List[List[Int]] =
     List(num) :: (1 until num).flatMap(n => partNumber(num - n).map(n :: _)).toList
 
-  def calc(arr: Int) = partNumber(arr).filter(a => compareAll[Int](a, _ < _)).count(_.min == 4)
+  def calc(arr: Int) = partNumber(arr).count(a => compareAll[Int](a, _ < _))
 
-  println(calc(15))
+  def loop(): Unit = {
+    val input = try scala.io.StdIn.readLine("Enter cubes count: ").toInt catch {
+      case e: NumberFormatException => println("Bye!"); return
+    }
+    println("Stairs count: " + calc(input))
+    loop()
+  }
+
+  loop()
 
 }
