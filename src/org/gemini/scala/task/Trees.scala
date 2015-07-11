@@ -10,6 +10,6 @@ object Trees extends App {
     else (0 to total - need).map(x => need + ((need - 1) * x)).
       filter(_ <= total).map(total - _ + 1).sum
 
-  println(trees(100, 20))
+  println(trees(5, 3))
 
 }
