@@ -5,20 +5,8 @@ package org.gemini.scala.labs
  */
 object Incremental extends App {
 
-  def pairs(f: (Int, Int) => Boolean)(initial: Int): Int => Boolean = {
-    var prev = initial
-    (num: Int) => f(num, prev) match {
-      case true => prev = num; true
-      case false => false
-    }
-  }
+  def str: Stream[BigInt] = 1 #:: str map (_ * 2)
 
-
-
-  val numbers = 0 to 1000
-
-  val filtered = numbers filter pairs(_ / _ == 2)(1)
-
-  println(filtered)
+  str take 100 foreach println
 
 }
