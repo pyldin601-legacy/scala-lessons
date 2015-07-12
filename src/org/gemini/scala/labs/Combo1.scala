@@ -5,10 +5,10 @@ package org.gemini.scala.labs
  */
 object Combo1 extends App {
 
-  val list = List(0, 2, 2, 2)
+  val list = MyListExample(0, 2, 2, 2)
 
   def part[T](list: List[T]): List[List[List[T]]] = {
-    List(list) :: (1 until list.length)
+    MyListExample(list) :: (1 until list.length)
       .flatMap(i => part(list drop i).map(list.take(i) :: _)).toList
   }
 
