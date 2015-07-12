@@ -5,8 +5,8 @@ package org.gemini.scala.labs
  */
 object Incremental extends App {
 
-  def str: Stream[BigInt] = 1 #:: str map (_ * 2)
+  def increment: Stream[BigInt] = 1 #:: increment map (_ * 2)
 
-  str take 100 foreach println
+  increment take 100 foreach println
 
 }
