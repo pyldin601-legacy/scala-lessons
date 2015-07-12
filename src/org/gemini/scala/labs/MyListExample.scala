@@ -13,22 +13,15 @@ object MyListExample extends App {
 
   object MyNil extends MyList[Any] {
     def empty = true
-    def head =
-      throw new NoSuchElementException
-    def tail =
-      throw new NoSuchElementException
+    def head = throw new NoSuchElementException
+    def tail = throw new NoSuchElementException
   }
 
-  class MyListItem[E](items: List[E]) extends MyList[E] {
-    def empty = items.isEmpty
-    def head = items.head
-    def tail = MyList(items.tail)
+  class MyListItem[E](item: E) extends MyList[E] {
+    def empty = false
+    def head = item
+    def tail = ???
   }
 
-  object MyList {
-    def apply[E](items: List[E]): MyList[E] = {
-      new MyListItem[E](items)
-    }
-  }
 
 }
