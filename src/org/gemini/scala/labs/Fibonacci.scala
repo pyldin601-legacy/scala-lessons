@@ -14,9 +14,5 @@ object Fibonacci extends App {
 
   def fact(n: BigInt): BigInt = BigInt(1) to n product
 
-
-
-  println(10!)
-
 }
 
