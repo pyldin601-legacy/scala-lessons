@@ -6,8 +6,7 @@ package org.gemini.scala.labs
 object Euclid extends App {
 
   def euclid(a: Int, b: Int): Int =
-    if (b == 0) a
-    else euclid(b, a % b)
+    if (b == 0) a else euclid(b, a % b)
 
   def euclid(numbers: Int*): Int =
     numbers reduce euclid
