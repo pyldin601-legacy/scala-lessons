@@ -9,7 +9,9 @@ object Euclid extends App {
     if (b == 0) a
     else euclid(b, a % b)
 
+  def euclid(numbers: Int*): Int =
+    numbers reduce euclid
 
-  println(euclid(1000, 340))
+  println(euclid(1024, 512))
 
 }
