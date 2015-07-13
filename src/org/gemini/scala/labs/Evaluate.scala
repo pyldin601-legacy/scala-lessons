@@ -43,7 +43,7 @@ object Evaluate extends App {
         parse(exp.tail, acc :+ Operand(exp.head.toString), stack)
     else
       if (stack.nonEmpty && Operator(exp.head).priority > stack.last.priority)
-        parse(exp.tail, acc ++ stack.reverse, MyListExample(Operator(exp.head)))
+        parse(exp.tail, acc ++ stack.reverse, List(Operator(exp.head)))
       else
         parse(exp.tail, acc :+ Operand(""), stack :+ Operator(exp.head))
 
