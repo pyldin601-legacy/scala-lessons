@@ -5,12 +5,20 @@ package org.gemini.scala.task
  */
 object Trees extends App {
 
-  def trees(total: Int, need: Int) =
-    if (need == 1) total
-    else (0 to total - need).map(x => need + (need - 1) * x).
-      filter(_ <= total).map(total - _ + 1).
+  /**
+   * Returns number of possible combinations of trees after felling
+   * with equal distances.
+   * @param totalTrees Trees count before felling
+   * @param neededNumberOfTrees Trees count after felling
+   * @return Count of combinations
+   */
+  def countCombinationsOfTrees(totalTrees: Int, neededNumberOfTrees: Int) =
+    if (neededNumberOfTrees == 1) totalTrees
+    else (0 to totalTrees - neededNumberOfTrees).
+      map(x => neededNumberOfTrees + (neededNumberOfTrees - 1) * x).
+      filter(_ <= totalTrees).map(totalTrees - _ + 1).
       sum
 
-  println(trees(1000, 250))
+  println(countCombinationsOfTrees(1000, 250))
 
 }
