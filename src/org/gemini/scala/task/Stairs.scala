@@ -12,14 +12,14 @@ package org.gemini.scala.task
  */
 object Stairs extends App {
 
-  def compareAll[A](list: List[A], p: (A, A) => Boolean): Boolean = {
+  def matchAllZippedPairs[A](list: List[A], p: (A, A) => Boolean): Boolean = {
     (list zip list.tail).forall(t => p(t._1, t._2))
   }
 
   def partNumber(num: Int): List[List[Int]] =
     List(num) :: (1 until num).
       flatMap(n => partNumber(num - n).map(n :: _)).
-      toList.filter(a => compareAll[Int](a, _ < _))
+      toList.filter(a => matchAllZippedPairs[Int](a, _ < _))
 
   def loop(): Unit = {
     val input = try scala.io.StdIn.readLine("Enter cubes count: ").toInt catch {
