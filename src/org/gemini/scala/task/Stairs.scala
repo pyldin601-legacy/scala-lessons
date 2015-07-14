@@ -13,9 +13,7 @@ package org.gemini.scala.task
 object Stairs extends App {
 
   def compareAll[A](list: List[A], p: (A, A) => Boolean): Boolean = {
-    if (list.isEmpty || list.tail.isEmpty) true
-    else if (p(list.head, list.tail.head)) compareAll(list.tail, p)
-    else false
+    (list zip list.tail).forall(t => p(t._1, t._2))
   }
 
   def partNumber(num: Int): List[List[Int]] =
