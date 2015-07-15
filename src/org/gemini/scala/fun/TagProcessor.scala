@@ -16,7 +16,7 @@ object TagProcessor extends App {
         case -1 =>
           throw new RuntimeException("Unclosed pattern bracket")
         case i =>
-          val key = pattern.substring(i)
+          val key = pattern.substring(i + 1, pattern.length - 1).trim
           val supportRight = pattern.lastIndexOf(MASK_POST, i) match {
             case -1 => 0
             case e => e + 1
@@ -39,9 +39,13 @@ object TagProcessor extends App {
   }
 
 
-  def mapStringByPattern(pattern: String, text: String): Map[String, String] =
+  def mapStringByPattern(pattern: String, text: String): Map[String, String] = {
+    if ((pattern zip pattern tail).exists(x => x._1 == '}' && x._2 == '{')) {
+      throw new RuntimeException("Error in template: No support between '}' and '{'.")
+    }
     parseValueUsingPattern(pattern, text, Map.empty)
-  
+  }
+
 
   println(mapStringByPattern(
     "/{artist}/{album}/{track_number}. {title}.{extension}",
