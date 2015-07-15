@@ -8,7 +8,15 @@ object TagProcessor extends App {
   val MASK_PREF = '{'
   val MASK_POST = '}'
 
-
+  /**
+   * This function is used for parsing text into HashMap
+   * with keys extracted from pattern.
+   *
+   * @param pattern Text containing pattern
+   * @param value Text that must be parsed
+   * @param acc Accumulation map used in tail recursion
+   * @return Map that contains parsed text into "key => value"
+   */
   private def parseValueUsingPattern(pattern: String, value: String, acc: Map[String, String]): Map[String, String] = {
     if (pattern.isEmpty) acc
     else if (pattern.last == MASK_POST) {
@@ -38,14 +46,12 @@ object TagProcessor extends App {
       Map.empty
   }
 
-
   def mapStringByPattern(pattern: String, text: String): Map[String, String] = {
     if ((pattern zip pattern tail).exists(x => x._1 == '}' && x._2 == '{')) {
       throw new RuntimeException("Error in template: No support between '}' and '{'.")
     }
     parseValueUsingPattern(pattern, text, Map.empty)
   }
-
 
   println(mapStringByPattern(
     "/{artist}/{album}/{track_number}. {title}.{extension}",
