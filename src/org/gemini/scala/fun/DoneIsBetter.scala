@@ -9,7 +9,7 @@ object DoneIsBetter extends App {
 
   object Done {
     def is(a: better.type): Done.type = { Done.this }
-    def than(b: perfect.type): String = "You wright, dude! ;)"
+    def than(b: perfect.type): String = "You're right, dude! ;)"
   }
 
   object better
